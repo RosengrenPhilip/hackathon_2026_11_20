@@ -1,5 +1,5 @@
 # Calm, soothing blue theme (light, locked).
-# Colors here also drive the calendar legend (greenColor / violetColor).
+# greenColor / violetColor match the calendar colors in calendar_view.py.
 
 [theme]
 base = "light"
@@ -17,8 +17,8 @@ linkUnderline = false
 
 # Soft semantic palette
 blueColor = "#4A7FB0"
-greenColor = "#4F9D7E"
-violetColor = "#8577C4"
+greenColor = "#2E8B66"
+violetColor = "#6C5BBF"
 redColor = "#C8605A"
 orangeColor = "#D08A4E"
 yellowColor = "#D4B04A"
