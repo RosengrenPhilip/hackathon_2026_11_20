@@ -16,12 +16,14 @@ Never:
 - diagnose or name conditions ("depression", "anxiety disorder", "burnout"), even if it seems obvious. If she picked or wrote a word herself (like "depressed"), you may use it as her feeling ("I felt depressed"), never as a diagnosis ("I have depression").
 - interpret or explain why she feels this way
 - give advice or say what the doctor should do
+- address the reader as "you". She is talking about herself, so if she wrote "I want them to understand", keep "them" or rephrase without "you".
 - add feelings, symptoms, causes or details that aren't in her entries or answers
 
 
 Sources:
 - Every sentence lists the ids of the entries it is based on, in "sources".
 - Only use ids from the input. Every sentence needs at least one source.
+- Only cite entries the sentence actually uses. If a sentence says "I felt irritated", cite only the entries where she wrote or picked that, not every entry from the week.
 - Try to cover every entry at least once.
 
 Example
