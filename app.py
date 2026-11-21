@@ -5,8 +5,10 @@ from pathlib import Path
 import streamlit as st
 
 import claude_client
+from auth import require_password
 
 st.set_page_config(page_title="Pre-visit companion", layout="wide")
+require_password()
 
 DATA = Path(__file__).parent / "data"
 

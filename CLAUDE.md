@@ -17,6 +17,7 @@ Demo user: Sara, 24, first psychiatry visit, struggles to explain how she feels.
 
 ## Claude API
 - anthropic Python SDK, model "claude-sonnet-5-5". Key from st.secrets["ANTHROPIC_API_KEY"] (.streamlit/secrets.toml, gitignored; see secrets.toml.example).
+- Optional APP_PASSWORD secret gates the whole app (auth.py) so a public link can't spend credits. Unset = no gate.
 - Call Claude only on button clicks or saves, never per keystroke. Show st.spinner while waiting.
 - All calls go through claude_client.py (`_call_json` helper: structured JSON output + safe fallback, errors go to st.session_state["last_error"]).
 - Prompts live in prompts/*.txt, not in code. Few-shot style examples: data/examples.json (Counsel Chat, regenerate with `uv run python scripts/build_examples.py`).
