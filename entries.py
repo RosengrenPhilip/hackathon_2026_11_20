@@ -5,6 +5,8 @@ Contract (don't change without telling the team):
                "answers": {"feelings": [...], "body": [...], "duration": str|None} or None,
                "clarification": one sentence or None}
   Several entries on the same date = that day's entry (they're shown together, in order).
+  update_entry(entry_id, text) - she edited her words; answers/clarification are kept.
+  set_answers(entry_id, answers, clarification) - she re-did the questionnaire for a saved entry.
 """
 import json
 from datetime import date, timedelta
@@ -42,6 +44,19 @@ def add_entry(day: date, text: str, answers: dict | None = None, clarification: 
         "answers": answers, "clarification": clarification,
     })
     return entry_id
+
+
+def update_entry(entry_id: str, text: str) -> None:
+    entry = by_id(entry_id)
+    if entry is not None and text.strip():
+        entry["text"] = text.strip()
+
+
+def set_answers(entry_id: str, answers: dict | None, clarification: str | None) -> None:
+    entry = by_id(entry_id)
+    if entry is not None:
+        entry["answers"] = answers
+        entry["clarification"] = clarification
 
 
 def for_day(day: date) -> list[dict]:

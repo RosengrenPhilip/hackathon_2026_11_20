@@ -1,0 +1,38 @@
+# Calm, soothing blue theme (light, locked).
+# greenColor / violetColor match the calendar colors in calendar_view.py.
+
+[theme]
+base = "light"
+
+# Surfaces: pale blue-white page, slightly deeper blue for inputs and cards
+backgroundColor = "#F5F8FB"
+secondaryBackgroundColor = "#E8EFF6"
+borderColor = "#D5E0EA"
+textColor = "#1F3245"
+
+# Accent: muted ocean blue (dark enough for white button text)
+primaryColor = "#3A6D9A"
+linkColor = "#3A6D9A"
+linkUnderline = false
+
+# Soft semantic palette
+blueColor = "#4A7FB0"
+greenColor = "#2E8B66"
+violetColor = "#6C5BBF"
+redColor = "#C8605A"
+orangeColor = "#D08A4E"
+yellowColor = "#D4B04A"
+grayColor = "#6B7C8D"
+
+# Type: rounded, modern, unhurried
+font = "'DM Sans':https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+baseFontSize = 15
+headingFontSizes = ["34px", "26px", "21px", "18px", "16px", "14px"]
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+
+# Shape: soft corners, generous breathing room
+baseRadius = "12px"
+buttonRadius = "10px"
+showWidgetBorder = true
+paddingTop = "2rem"
+paddingBottom = "3rem"

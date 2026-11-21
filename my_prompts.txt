@@ -1,0 +1,42 @@
+My prompts to Claude Code (hackathon, 2026-11-21)
+==================================================
+
+1.
+I am at a hackathon with two friends we have until 17:30 to build a functioning demo. It is about AI for healthcare solutions. We have decided to go with a solution for psychiatric patients and clinicians. The problem we want to solve is for patients not to waste time during meetings on freezing/understating/forgetting how they have felt during th time up unitl a meeting. Also to let the psychiatrist get up to speed ahead of the meeting to make it as effective as possible. We want to use claude code to begin the project. How do we use it most effectively? including context, prompts, collaboration between us, workload etc?
+
+2.
+my friend is currently doin much of this to set everything up. What can i do in the meantime?
+
+3.
+Can you give me an example of the workflow i would do in 1, practically?
+
+4.
+yes please
+
+5.
+if i run the command in the terminal, does it open a new vscode terminal or what happens?
+
+6.
+git clone https://github.com/RosengrenPhilip/hackathon_2026_11_20.git
+cd hackathon_2026_11_20
+uv sync
+
+Can you see if this could be installed for me?
+
+7.
+just work from this project now, forget about the other one now. you can delete it
+
+8.
+in streamlit, where is the desgining?
+
+9.
+can i open a version of the streamlit app based on my claude code API key and use credits from me? or is it now always conected to my friend who set it up?
+
+10.
+now i want to begin changing the UI for our app.  first of all we want a caldendar in the top left. Here you should be able to see if you have written a note about your mood per day, almost like a github contribution board, where day day icon should be colored green. An appointment with a psychiatrist should be colored purple. It should be interactive and whenever you choose an earlier day, its text box with your notes shall show up, and you shouldnt be able to click on future days
+
+11.
+make the design soothing and calm. A bleuish theme with modern interface
+
+12.
+save a .txt file with all my prompts in this conversation

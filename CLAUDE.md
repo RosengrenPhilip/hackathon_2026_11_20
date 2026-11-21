@@ -1,4 +1,4 @@
-# Project: Pre-visit companion (hackathon, deadline 17:30)
+# Project: Inwords, pre-visit journal (hackathon, deadline 17:30)
 
 ## What it is
 A Streamlit journal app that helps psychiatry patients put their feelings into words before a visit.
@@ -13,7 +13,7 @@ Main feature: detect vagueness in journal entries and gently help her be more sp
    - Vague: highlight the vague phrases. Offer (optional) "Help me find the words" (gentle "what fits best for you?" feeling-word chips from data/feelings.txt) and "Mark where in my body" (body area + duration chips). She can always "Save as is".
    - After she answers: save her ORIGINAL words + her answers + a one-sentence clarification shown underneath. The clarification uses ONLY what she picked; never add feelings or symptoms she didn't pick or write.
    - Writing again on the same day adds to that day (several entries per date, shown together).
-2. Calendar: small month calendar in the top corner. Green = day has an entry, red = no entry. Clicking a day opens that day's entries (with clarifications).
+2. Calendar: small month calendar in the top corner. Green = day has an entry, gray = no entry, purple = psychiatrist appointment (data/appointments.json). Future days are locked. Clicking a day opens that day's entries (with clarifications).
 3. Summary: "Summarize week" (default the last 7 days, or a chosen period) -> short running-text summary.
    - Built from her ORIGINAL text + her answers, NOT from the clarification sentence.
    - Every sentence shows which entry IDs it came from; clicking a source opens that day and highlights the entry.
@@ -32,10 +32,12 @@ Main feature: detect vagueness in journal entries and gently help her be more sp
 | File | Owner | What |
 |---|---|---|
 | app.py | C | page layout, day view, entry box; calls the other modules |
-| calendar_view.py | C | small green/red month calendar |
+| calendar_view.py | C | small green/gray/purple month calendar |
+| questionnaire.py | C | popup wizard (3 steps, one tap each, Skip per step) for new vague entries and for re-answering saved ones (Edit → Change answers); uses A's pending contract, BODY/DURATION, claude_client.clarify |
 | entries.py | C | entry storage in session_state (add_entry, for_day, between, by_id) |
 | auth.py | C | password gate |
 | data/sara.json | C | demo entries (`days_ago` so dates stay current) |
+| data/appointments.json | C | appointments (`days_from_now`) |
 | .streamlit/config.toml | C | theme/colors (create if needed) |
 | vagueness.py | A | handle_new_entry + render_pending: detection, highlight, chips, save |
 | prompts/vagueness.txt, prompts/clarify.txt | A | prompts |
@@ -52,7 +54,7 @@ Three people work in parallel on separate branches. If it isn't clear which pers
 |---|---|---|
 | A | feature/vagueness | vagueness.py, prompts/vagueness.txt, prompts/clarify.txt, "PERSON A" section of claude_client.py |
 | B | feature/summary | summary.py, prompts/summary.txt, "PERSON B" section of claude_client.py |
-| C | feature/gui | app.py, calendar_view.py, entries.py, auth.py, data/sara.json, .streamlit/config.toml |
+| C | feature/gui | app.py, calendar_view.py, questionnaire.py, entries.py, auth.py, data/sara.json, .streamlit/config.toml |
 Rules:
 - NEVER edit another person's files or claude_client.py sections. If a change is needed there, tell the user what to ask the owner for.
 - Each module's docstring is its contract (function signatures + session_state format). Don't change a contract without the team agreeing.
