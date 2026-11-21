@@ -1,1 +1,9 @@
-[]
+[
+  {"id": "E1", "days_ago": 12, "text": "Couldn't get out of bed until 11 again. Not tired exactly, just heavy. Skipped my morning lecture.", "answers": null, "clarification": null},
+  {"id": "E2", "days_ago": 10, "text": "Lunch with Mia. She asked how I'm doing and I said fine but I felt like I was watching myself from far away. Chest felt tight the whole time.", "answers": null, "clarification": null},
+  {"id": "E3", "days_ago": 9, "text": "Lay awake until 3. My head keeps replaying the group project meeting where I froze when it was my turn to talk.", "answers": null, "clarification": null},
+  {"id": "E4", "days_ago": 6, "text": "Stopped going to climbing. Used to be my favourite thing. Now it just feels like effort.", "answers": null, "clarification": null},
+  {"id": "E5", "days_ago": 5, "text": "Mum called. I got irritated over nothing and hung up. idk, just off.", "answers": {"feelings": ["irritated", "guilty", "numb"], "body": ["chest"], "duration": "A few weeks"}, "clarification": "I've felt irritated, guilty and numb, with a tightness in my chest, for a few weeks."},
+  {"id": "E6", "days_ago": 3, "text": "Booked my first psychiatry appointment. I want them to understand it's not just stress, but every time I try to explain it the words disappear.", "answers": null, "clarification": null},
+  {"id": "E7", "days_ago": 1, "text": "Ate dinner standing in the kitchen again. Didn't really taste anything.", "answers": null, "clarification": null}
+]
