@@ -154,8 +154,8 @@ def rephrase(answer: str, feelings: list[str], body: list[str], duration: str | 
 
 
 # =====================================================================
-# PERSON C (feature/safety): crisis check
-# Only edit inside this section. Prompt: prompts/safety.txt
+# FROZEN (was person C): crisis check - not used, safety.py uses keywords
+# Nobody edits this section.
 # =====================================================================
 def crisis_check(text: str) -> dict | None:
     """Check text for self-harm, hopelessness, plans.

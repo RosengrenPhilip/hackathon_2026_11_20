@@ -1,4 +1,4 @@
-"""PERSON C owns this file: the visit brief panel + receipts.
+"""PERSON A owns this file: the visit brief panel + receipts.
 
 Contract (don't change without telling the team):
   render_brief() - called by app.py at the top of the right column.

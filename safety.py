@@ -1,4 +1,4 @@
-"""PERSON C owns this file: crisis check + banner.
+"""FROZEN (no owner): keyword crisis check + banner. Do not edit.
 
 Contract (don't change without telling the team):
   check_text(text, source) -> bool  - called on every new note (app.py) and answer (questions.py).
