@@ -8,7 +8,6 @@ import streamlit as st
 import brief
 import claude_client
 import questions
-import safety
 from auth import require_password
 
 st.set_page_config(page_title="Pre-visit companion", layout="wide")
@@ -32,7 +31,6 @@ def next_note_id() -> str:
 
 
 init_state()
-safety.render_banner()
 
 st.title("Pre-visit companion")
 st.caption("Others summarize what patients say. We help patients say it.")
@@ -60,7 +58,6 @@ with left:
             st.session_state.notes.append(
                 {"id": note_id, "date": date.today().isoformat(), "text": text.strip()}
             )
-            safety.check_text(text, source=f"note {note_id}")
             st.rerun()
 
 # ---------------- RIGHT: Brief + questions ----------------

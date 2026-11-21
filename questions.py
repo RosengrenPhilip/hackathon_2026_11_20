@@ -5,12 +5,11 @@ Contract (don't change without telling the team):
   Each item in st.session_state.questions:
       {"question", "note_id", "angle", "status": "open"|"answered"|"skipped", "answer"}
   Each brief line appended to st.session_state.brief:
-      {"id": "L1", "text", "sources": ["E2"], "section", "status": "draft"|"approved", "crisis": bool}
+      {"id": "L1", "text", "sources": ["E2"], "section", "status": "draft"|"approved"}
 """
 import streamlit as st
 
 import claude_client
-import safety
 import wordfinder
 
 VAGUE = ("idk", "i don't know", "dunno", "just off", "not sure", "whatever")
@@ -21,10 +20,10 @@ def is_vague(answer: str) -> bool:
     return len(a.split()) < 4 or any(v in a for v in VAGUE)
 
 
-def add_brief_line(line: dict, crisis: bool = False) -> None:
+def add_brief_line(line: dict) -> None:
     """Shared helper (wordfinder.py uses it too)."""
     brief = st.session_state.brief
-    brief.append({"id": f"L{len(brief) + 1}", "status": "draft", "crisis": crisis, **line})
+    brief.append({"id": f"L{len(brief) + 1}", "status": "draft", **line})
 
 
 def render_questions() -> None:
@@ -49,13 +48,12 @@ def render_questions() -> None:
                 if not answer.strip():
                     st.warning("Write something first, or Skip.")
                     continue
-                crisis = safety.check_text(answer, source=f"answer about {q['note_id']}")
                 with st.spinner("Writing your brief line..."):
                     line = claude_client.answer_to_brief_line(
                         q["question"], answer, q["note_id"], st.session_state.notes
                     )
                 if line:
-                    add_brief_line(line, crisis)
+                    add_brief_line(line)
                 q.update(status="answered", answer=answer)
                 st.rerun()
             if c2.button("Skip", key=f"skip_{i}"):

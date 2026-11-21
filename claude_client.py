@@ -151,15 +151,3 @@ def rephrase(answer: str, feelings: list[str], body: list[str], duration: str | 
     TODO(B): call Claude via _call_json.
     """
     return None
-
-
-# =====================================================================
-# FROZEN (was person C): crisis check - not used, safety.py uses keywords
-# Nobody edits this section.
-# =====================================================================
-def crisis_check(text: str) -> dict | None:
-    """Check text for self-harm, hopelessness, plans.
-    Returns {"crisis": bool, "reason": str} or None on failure (safety.py then uses keywords).
-    TODO(C): call Claude via _call_json with prompts/safety.txt.
-    """
-    return None

@@ -13,7 +13,6 @@ Demo user: Sara, 24, first psychiatry visit, struggles to explain how she feels.
 2. Each question has Answer / Skip. When she answers, Claude turns the answer into one brief line with source IDs (e.g. ["E2"]). She can approve, edit or remove each line.
 3. Word finder: if an answer is vague ("idk, just off"), show "Help me find the words": 6 feeling words (from data/feelings.txt, the Feelings Wheel), body area and duration chips (st.pills). Claude then writes one rephrasing ONLY from what she picked; she accepts, edits or rejects. Never add symptoms she didn't pick or write.
 4. Receipts: clicking a brief line highlights its source notes on the left. A line with no source is flagged red.
-5. Safety: on every new note or answer, run a crisis check (self-harm, hopelessness, plans). If triggered, show a banner with 1177 and 112 right away, and flag the line for the clinician. This is not therapy and never diagnoses.
 
 ## Claude API
 - anthropic Python SDK, model "claude-sonnet-5-5". Key from st.secrets["ANTHROPIC_API_KEY"] (.streamlit/secrets.toml, gitignored; see secrets.toml.example).
@@ -28,7 +27,6 @@ auth.py           # password gate (DONE)
 claude_client.py  # all Claude calls; one section per person (see below)
 questions.py      # A: question cards, Answer/Skip -> brief line
 wordfinder.py     # B: "Help me find the words"
-safety.py         # FROZEN: keyword crisis check + banner
 brief.py          # A: brief panel, approve/edit/remove, receipts
 prompts/          # questions.txt (done), brief_line.txt (A), wordfinder.txt (B)
 data/             # sara.json (demo notes, preloaded), feelings.txt, examples.json
@@ -40,12 +38,12 @@ Three people work in parallel on separate branches. Before editing, ask the user
 | A | feature/questions | questions.py, brief.py, prompts/brief_line.txt, "PERSON A" section of claude_client.py |
 | B | feature/wordfinder | wordfinder.py, prompts/wordfinder.txt, "PERSON B" section of claude_client.py |
 | C | (no code) | Pitch, demo script, testing the live app. Doesn't edit code. |
-Safety is FROZEN: safety.py keeps its keyword check + 1177/112 banner, no Claude call. Nobody edits safety.py, prompts/safety.txt or the "PERSON C" section of claude_client.py.
+No safety/crisis feature: it was deliberately dropped. Don't add one.
 Rules:
 - NEVER edit another person's files or claude_client.py sections. If a change is needed there, tell the user what to ask the owner for.
 - Don't edit app.py or auth.py. The wiring is done; each module's docstring describes its contract (function signature + session_state format). Don't change a contract without the team agreeing.
 - Brief lines (brief.py, owned by A): approve / edit / remove, click = highlight sources.
-- Data shared via st.session_state: notes, questions, asked, brief, highlight, crisis, last_error. Formats are in the module docstrings.
+- Data shared via st.session_state: notes, questions, asked, brief, highlight, last_error. Formats are in the module docstrings.
 - Work only on your own branch; merge to main via Pull Request. main is what Streamlit Cloud deploys, so it must always run.
 - Guardrail: copy .claude/team/person-X.json to .claude/settings.local.json; it denies edits to other people's files.
 

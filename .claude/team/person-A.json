@@ -3,10 +3,8 @@
     "deny": [
       "Edit(./app.py)",
       "Edit(./auth.py)",
-      "Edit(./safety.py)",
       "Edit(./wordfinder.py)",
-      "Edit(./prompts/wordfinder.txt)",
-      "Edit(./prompts/safety.txt)"
+      "Edit(./prompts/wordfinder.txt)"
     ]
   }
 }
