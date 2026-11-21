@@ -89,18 +89,72 @@ def detect_vagueness(text: str, feelings_wheel: str) -> dict | None:
              "question": gentle "what fits best for you?"-style question,
              "feeling_options": [6 words from the feelings wheel that might fit]}
     or None on failure (vagueness.py then uses a keyword fallback).
-    TODO(A): call Claude via _call_json with prompts/vagueness.txt.
     """
-    return None
+    system = _prompt("vagueness").replace("{feelings_wheel}", feelings_wheel)
+    result = _call_json(system, f"Journal entry:\n{text}", _VAGUENESS_SCHEMA, effort="low")
+    if result is None:
+        return None
+    if not result["is_vague"]:
+        return {"is_vague": False, "vague_phrases": [], "question": "", "feeling_options": []}
+
+    # Only keep phrases that really appear in her text (otherwise highlighting can't find them).
+    lowered = text.lower()
+    phrases = [p for p in result["vague_phrases"] if p.strip() and p.lower() in lowered][:3]
+    # Only keep feeling words that are really on the wheel.
+    wheel = _wheel_words(feelings_wheel)
+    options = list(dict.fromkeys(w.lower() for w in result["feeling_options"] if w.lower() in wheel))[:6]
+    return {
+        "is_vague": True,
+        "vague_phrases": phrases,
+        "question": result["question"].strip(),
+        "feeling_options": options if len(options) >= 3 else [],  # [] -> vagueness.py fallback words
+    }
 
 
 def clarify(text: str, answers: dict) -> str | None:
     """One first-person sentence built ONLY from what she picked in `answers`
     ({"feelings": [...], "body": [...], "duration": str|None}). Never add anything she didn't pick.
     Returns the sentence, or None on failure (vagueness.py then uses a template).
-    TODO(A): call Claude via _call_json with prompts/clarify.txt.
+    `text` is deliberately NOT sent to Claude, so nothing beyond her picks can leak into the sentence.
     """
-    return None
+    picks = {"feelings": answers.get("feelings") or [], "body": answers.get("body") or [],
+             "duration": answers.get("duration")}
+    result = _call_json(_prompt("clarify"), json.dumps(picks), _CLARIFY_SCHEMA, effort="low")
+    if result is None:
+        return None
+    sentence = result["sentence"].strip()
+    return sentence or None
+
+
+_VAGUENESS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "is_vague": {"type": "boolean"},
+        "vague_phrases": {"type": "array", "items": {"type": "string"}},
+        "question": {"type": "string"},
+        "feeling_options": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["is_vague", "vague_phrases", "question", "feeling_options"],
+    "additionalProperties": False,
+}
+
+_CLARIFY_SCHEMA = {
+    "type": "object",
+    "properties": {"sentence": {"type": "string"}},
+    "required": ["sentence"],
+    "additionalProperties": False,
+}
+
+
+def _wheel_words(feelings_wheel: str) -> set[str]:
+    """All words on the wheel ("Sad: lonely, empty" -> {"sad", "lonely", "empty"})."""
+    words = set()
+    for line in feelings_wheel.splitlines():
+        if ":" in line and not line.startswith("#"):
+            core, rest = line.split(":", 1)
+            words.add(core.strip().lower())
+            words.update(w.strip().lower() for w in rest.split(",") if w.strip())
+    return words
 
 
 # =====================================================================
