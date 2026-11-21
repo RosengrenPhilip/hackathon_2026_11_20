@@ -12,13 +12,19 @@ PROMPTS = ROOT / "prompts"
 DATA = ROOT / "data"
 
 
+def _secret(name: str) -> str | None:
+    try:
+        return st.secrets[name]
+    except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
+        return os.environ.get(name)
+
+
 @st.cache_resource
 def _client() -> anthropic.Anthropic:
-    try:
-        key = st.secrets["ANTHROPIC_API_KEY"]
-    except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
-        key = os.environ.get("ANTHROPIC_API_KEY")
-    return anthropic.Anthropic(api_key=key)
+    # Org-level keys (not scoped to a workspace) must name the workspace to bill.
+    workspace = _secret("ANTHROPIC_WORKSPACE_ID")
+    headers = {"anthropic-workspace-id": workspace} if workspace else None
+    return anthropic.Anthropic(api_key=_secret("ANTHROPIC_API_KEY"), default_headers=headers)
 
 
 @st.cache_data
