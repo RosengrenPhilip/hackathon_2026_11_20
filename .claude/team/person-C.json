@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(./vagueness.py)",
+      "Edit(./prompts/vagueness.txt)",
+      "Edit(./prompts/clarify.txt)",
+      "Edit(./summary.py)",
+      "Edit(./prompts/summary.txt)"
+    ]
+  }
+}

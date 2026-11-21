@@ -1,10 +1,14 @@
 {
   "permissions": {
     "deny": [
+      "Edit(./summary.py)",
+      "Edit(./prompts/summary.txt)",
       "Edit(./app.py)",
+      "Edit(./calendar_view.py)",
+      "Edit(./entries.py)",
       "Edit(./auth.py)",
-      "Edit(./wordfinder.py)",
-      "Edit(./prompts/wordfinder.txt)"
+      "Edit(./data/sara.json)",
+      "Edit(./.streamlit/config.toml)"
     ]
   }
 }

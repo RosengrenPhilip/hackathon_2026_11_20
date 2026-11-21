@@ -1,12 +1,15 @@
 {
   "permissions": {
     "deny": [
+      "Edit(./vagueness.py)",
+      "Edit(./prompts/vagueness.txt)",
+      "Edit(./prompts/clarify.txt)",
       "Edit(./app.py)",
+      "Edit(./calendar_view.py)",
+      "Edit(./entries.py)",
       "Edit(./auth.py)",
-      "Edit(./questions.py)",
-      "Edit(./brief.py)",
-      "Edit(./prompts/brief_line.txt)",
-      "Edit(./prompts/questions.txt)"
+      "Edit(./data/sara.json)",
+      "Edit(./.streamlit/config.toml)"
     ]
   }
 }

@@ -77,77 +77,41 @@ def _call_json(system: str, user: str, schema: dict, effort: str = "medium") -> 
         return None
 
 
-def _notes_block(notes: list[dict]) -> str:
-    return "\n".join(f"[{n['id']}] {n['date']}: {n['text']}" for n in notes)
-
-
-QUESTIONS_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "questions": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "question": {"type": "string"},
-                    "note_id": {"type": "string"},
-                    "angle": {
-                        "type": "string",
-                        "enum": ["body", "situations", "people", "changes", "goals"],
-                    },
-                },
-                "required": ["question", "note_id", "angle"],
-                "additionalProperties": False,
-            },
-        }
-    },
-    "required": ["questions"],
-    "additionalProperties": False,
-}
-
-
-def get_questions(notes: list[dict], asked: list[str]) -> list[dict]:
-    """Return 3 questions [{question, note_id, angle}], each tied to a real note."""
-    system = _prompt("questions").replace("{examples}", _examples_block())
-    previously = "\n".join(f"- {q}" for q in asked) or "(none yet)"
-    user = (
-        f"<notes>\n{_notes_block(notes)}\n</notes>\n\n"
-        f"<previously_asked>\n{previously}\n</previously_asked>\n\n"
-        "Write 3 new questions."
-    )
-    data = _call_json(system, user, QUESTIONS_SCHEMA)
-    if not data:
-        return []
-    valid_ids = {n["id"] for n in notes}
-    return [q for q in data.get("questions", []) if q.get("note_id") in valid_ids][:3]
-
 
 # =====================================================================
-# PERSON A (feature/questions): answer -> brief line
-# Only edit inside this section. Prompt: prompts/brief_line.txt
+# PERSON A: vagueness detection + clarification
+# Only edit inside this section. Prompts: prompts/vagueness.txt, prompts/clarify.txt
 # =====================================================================
-def answer_to_brief_line(question: str, answer: str, note_id: str, notes: list[dict]) -> dict | None:
-    """Turn her answer into ONE first-person brief line.
-    Returns {"text": str, "sources": ["E2", ...], "section": str} or None on failure.
-    TODO(A): call Claude via _call_json with prompts/brief_line.txt.
-    """
-    return {"text": answer.strip(), "sources": [note_id], "section": "What I want from today"}
-
-
-# =====================================================================
-# PERSON B (feature/wordfinder): word finder
-# Only edit inside this section. Prompt: prompts/wordfinder.txt
-# =====================================================================
-def wordfinder_options(answer: str, note_text: str) -> dict | None:
-    """Suggest 6 feeling words from data/feelings.txt that might fit.
-    Returns {"feelings": [6 words]} or None.
-    TODO(B): call Claude via _call_json.
+def detect_vagueness(text: str, feelings_wheel: str) -> dict | None:
+    """Is this journal entry vague about how she feels?
+    Returns {"is_vague": bool,
+             "vague_phrases": [exact substrings of text, e.g. "just off"],
+             "question": gentle "what fits best for you?"-style question,
+             "feeling_options": [6 words from the feelings wheel that might fit]}
+    or None on failure (vagueness.py then uses a keyword fallback).
+    TODO(A): call Claude via _call_json with prompts/vagueness.txt.
     """
     return None
 
 
-def rephrase(answer: str, feelings: list[str], body: list[str], duration: str | None) -> str | None:
-    """Write ONE first-person sentence using ONLY what she picked. Never add symptoms.
-    TODO(B): call Claude via _call_json.
+def clarify(text: str, answers: dict) -> str | None:
+    """One first-person sentence built ONLY from what she picked in `answers`
+    ({"feelings": [...], "body": [...], "duration": str|None}). Never add anything she didn't pick.
+    Returns the sentence, or None on failure (vagueness.py then uses a template).
+    TODO(A): call Claude via _call_json with prompts/clarify.txt.
+    """
+    return None
+
+
+# =====================================================================
+# PERSON B: summary with sources
+# Only edit inside this section. Prompt: prompts/summary.txt
+# =====================================================================
+def summarize(entries: list[dict]) -> dict | None:
+    """Short running-text summary of the given entries.
+    Input per entry: id, date, text (her original words) and answers (what she picked).
+    The clarification sentence must NOT be sent - the summary is built from her own words + answers.
+    Returns {"sentences": [{"text": str, "sources": ["E2", ...]}]} or None on failure.
+    TODO(B): call Claude via _call_json with prompts/summary.txt.
     """
     return None

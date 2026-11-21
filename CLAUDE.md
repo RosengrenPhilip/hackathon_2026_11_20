@@ -1,54 +1,66 @@
 # Project: Pre-visit companion (hackathon, deadline 17:30)
 
 ## What it is
-A Streamlit web app that helps psychiatry patients put their feelings into words before a visit. Pitch: "Others summarize what patients say. We help patients say it."
+A Streamlit journal app that helps psychiatry patients put their feelings into words before a visit.
+Pitch: "Others summarize what patients say. We help patients say it."
 Demo user: Sara, 24, first psychiatry visit, struggles to explain how she feels.
-
-## The app (two columns)
-- LEFT, Notes: an editable list of journal entries (date + text, "Add note" button). Store in st.session_state so edits persist while the app runs. Each entry has an ID (E1, E2...).
-- RIGHT, Brief: a one-page visit brief that grows as she answers questions. Written in first person, in her voice. The first section is always "What I want from today"; other sections appear only if her notes support them.
+Main feature: detect vagueness in journal entries and gently help her be more specific.
 
 ## Flow
-1. User clicks "Reflect on my week". Claude reads ALL current notes and returns 3 personal questions as JSON. Each question must refer to a specific note. Send previously asked questions so they never repeat. Vary the angle (body, situations, people, changes, goals).
-2. Each question has Answer / Skip. When she answers, Claude turns the answer into one brief line with source IDs (e.g. ["E2"]). She can approve, edit or remove each line.
-3. Word finder: if an answer is vague ("idk, just off"), show "Help me find the words": 6 feeling words (from data/feelings.txt, the Feelings Wheel), body area and duration chips (st.pills). Claude then writes one rephrasing ONLY from what she picked; she accepts, edits or rejects. Never add symptoms she didn't pick or write.
-4. Receipts: clicking a brief line highlights its source notes on the left. A line with no source is flagged red.
+1. Journal entry: she writes about her day and clicks "Save entry".
+   - Claude checks for vagueness ("idk, just off", "weird", "bad day").
+   - Not vague: save the entry for that day. Done.
+   - Vague: highlight the vague phrases. Offer (optional) "Help me find the words" (gentle "what fits best for you?" feeling-word chips from data/feelings.txt) and "Mark where in my body" (body area + duration chips). She can always "Save as is".
+   - After she answers: save her ORIGINAL words + her answers + a one-sentence clarification shown underneath. The clarification uses ONLY what she picked; never add feelings or symptoms she didn't pick or write.
+   - Writing again on the same day adds to that day (several entries per date, shown together).
+2. Calendar: small month calendar in the top corner. Green = day has an entry, red = no entry. Clicking a day opens that day's entries (with clarifications).
+3. Summary: "Summarize week" (default the last 7 days, or a chosen period) -> short running-text summary.
+   - Built from her ORIGINAL text + her answers, NOT from the clarification sentence.
+   - Every sentence shows which entry IDs it came from; clicking a source opens that day and highlights the entry.
+- No safety/crisis feature: it was deliberately dropped. Don't add one.
+- Not therapy, never diagnoses.
 
 ## Claude API
 - anthropic Python SDK, model "claude-sonnet-5-5". Key from st.secrets["ANTHROPIC_API_KEY"] (.streamlit/secrets.toml, gitignored; see secrets.toml.example).
-- Optional APP_PASSWORD secret gates the whole app (auth.py) so a public link can't spend credits. Unset = no gate.
-- Call Claude only on button clicks or saves, never per keystroke. Show st.spinner while waiting.
-- All calls go through claude_client.py (`_call_json` helper: structured JSON output + safe fallback, errors go to st.session_state["last_error"]).
-- Prompts live in prompts/*.txt, not in code. Few-shot style examples: data/examples.json (Counsel Chat, regenerate with `uv run python scripts/build_examples.py`).
+- Optional APP_PASSWORD secret gates the whole app (auth.py). Unset = no gate.
+- Call Claude only on button clicks, never per keystroke. Show st.spinner while waiting.
+- All calls go through claude_client.py: use the `_call_json(system, user, schema)` helper (structured JSON output, returns None on any failure; errors go to st.session_state["last_error"]).
+- Every Claude feature has a non-Claude fallback so the demo never breaks.
+- Prompts live in prompts/*.txt, not in code. data/examples.json has Counsel Chat examples for a warm tone (`_examples_block()`).
 
 ## Structure
-app.py            # layout, state, wiring (DONE - shared, don't edit without asking the team)
-auth.py           # password gate (DONE)
-claude_client.py  # all Claude calls; one section per person (see below)
-questions.py      # A: question cards, Answer/Skip -> brief line
-wordfinder.py     # B: "Help me find the words"
-brief.py          # A: brief panel, approve/edit/remove, receipts
-prompts/          # questions.txt (done), brief_line.txt (A), wordfinder.txt (B)
-data/             # sara.json (demo notes, preloaded), feelings.txt, examples.json
+| File | Owner | What |
+|---|---|---|
+| app.py | C | page layout, day view, entry box; calls the other modules |
+| calendar_view.py | C | small green/red month calendar |
+| entries.py | C | entry storage in session_state (add_entry, for_day, between, by_id) |
+| auth.py | C | password gate |
+| data/sara.json | C | demo entries (`days_ago` so dates stay current) |
+| .streamlit/config.toml | C | theme/colors (create if needed) |
+| vagueness.py | A | handle_new_entry + render_pending: detection, highlight, chips, save |
+| prompts/vagueness.txt, prompts/clarify.txt | A | prompts |
+| summary.py | B | render_summary: period picker, summary text, clickable sources |
+| prompts/summary.txt | B | prompt |
+| claude_client.py | shared | "PERSON A" section (detect_vagueness, clarify), "PERSON B" section (summarize) |
+
+Entry format (entries.py): {"id": "E3", "date": "YYYY-MM-DD", "text", "answers": {"feelings", "body", "duration"} | None, "clarification": str | None}
+Shared session_state: entries, selected_day, cal_month, highlight, pending, summary, last_error.
 
 ## Team ownership (IMPORTANT for Claude Code)
-Three people work in parallel on separate branches. Before editing, ask the user which person they are if it isn't clear.
+Three people work in parallel on separate branches. If it isn't clear which person the user is, ask before editing.
 | Person | Branch | May edit |
 |---|---|---|
-| A | feature/questions | questions.py, brief.py, prompts/brief_line.txt, "PERSON A" section of claude_client.py |
-| B | feature/wordfinder | wordfinder.py, prompts/wordfinder.txt, "PERSON B" section of claude_client.py |
-| C | (no code) | Pitch, demo script, testing the live app. Doesn't edit code. |
-No safety/crisis feature: it was deliberately dropped. Don't add one.
+| A | feature/vagueness | vagueness.py, prompts/vagueness.txt, prompts/clarify.txt, "PERSON A" section of claude_client.py |
+| B | feature/summary | summary.py, prompts/summary.txt, "PERSON B" section of claude_client.py |
+| C | feature/gui | app.py, calendar_view.py, entries.py, auth.py, data/sara.json, .streamlit/config.toml |
 Rules:
 - NEVER edit another person's files or claude_client.py sections. If a change is needed there, tell the user what to ask the owner for.
-- Don't edit app.py or auth.py. The wiring is done; each module's docstring describes its contract (function signature + session_state format). Don't change a contract without the team agreeing.
-- Brief lines (brief.py, owned by A): approve / edit / remove, click = highlight sources.
-- Data shared via st.session_state: notes, questions, asked, brief, highlight, last_error. Formats are in the module docstrings.
+- Each module's docstring is its contract (function signatures + session_state format). Don't change a contract without the team agreeing.
 - Work only on your own branch; merge to main via Pull Request. main is what Streamlit Cloud deploys, so it must always run.
 - Guardrail: copy .claude/team/person-X.json to .claude/settings.local.json; it denies edits to other people's files.
 
 ## Constraints
 - Python + uv. Run: `uv run streamlit run app.py`. `datasets` is a dev-only dependency.
 - Deploy on Streamlit Community Cloud with app.py in root. requirements.txt is generated: `uv export --no-dev --no-hashes -o requirements.txt` (re-run after `uv add`).
-- Keep it simple and demo-stable. Preload Sara's notes so the demo works with one click.
+- Keep it simple and demo-stable. Sara's entries are preloaded so the demo works immediately.
 - Commit small and often.
