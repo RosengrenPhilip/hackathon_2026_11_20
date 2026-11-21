@@ -45,8 +45,51 @@ _CSS = f"""
 [class*="st-key-cal-"][class*="-today-"] button p {{
     font-weight: 700; text-decoration: underline; text-underline-offset: 3px;
 }}
+/* Summary period (My summary view): a blue bar under each day in the period. */
+[class*="st-key-cal-"][class*="-range-"] button {{ box-shadow: inset 0 -4px 0 {SELECTED_RING}; }}
+[class*="st-key-cal-"][class*="-range-"][class*="-sel-"] button {{
+    box-shadow: inset 0 -4px 0 {SELECTED_RING}, 0 0 0 2px {PAGE_BG}, 0 0 0 4px {SELECTED_RING};
+}}
 </style>
 """
+
+SV_MONTHS = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti",
+             "september", "oktober", "november", "december"]
+EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+             "September", "October", "November", "December"]
+
+
+def _picker_selectors(d: date) -> list[str]:
+    """CSS selectors for day d in Streamlit's date-picker popup (person B's summary period picker).
+    The popup only labels days in the browser's language, so match Swedish and English labels,
+    plain and selected. Suffix matches keep "3 november" from also matching "13 november"."""
+    sv = f"{d.day} {SV_MONTHS[d.month - 1]} {d.year}"
+    en = f"{EN_MONTHS[d.month - 1]} {d.day}, {d.year}"
+    ends = [f" {sv}", f" {sv} har valts", f" {en}", f" {en} selected"]
+    # Start/end of a chosen period keep the picker's own circle (coloring them hides the number).
+    btn = '[role="gridcell"] [role="button"]:not([data-selection-start]):not([data-selection-end])'
+    return [f'{btn}[aria-label$="{e}" i]' for e in ends]
+
+
+def _picker_css(filled: set[str], appts: dict[date, str], today: date) -> str:
+    """Color the summary date picker's days exactly like this calendar."""
+    first = min([date.fromisoformat(x) for x in filled] + [today]).replace(day=1)
+    last = max([*appts, today])
+    rules = []
+    d = first
+    while d <= last:
+        if d in appts:
+            bg, fg = APPT_PURPLE, "#fff"
+        elif d > today:
+            d += timedelta(days=1)
+            continue
+        elif d.isoformat() in filled:
+            bg, fg = ENTRY_GREEN, "#fff"
+        else:
+            bg, fg = EMPTY_BG, EMPTY_TEXT
+        rules.append(f"{', '.join(_picker_selectors(d))} {{ background: {bg} !important; color: {fg} !important; }}")
+        d += timedelta(days=1)
+    return "<style>\n" + "\n".join(rules) + "\n</style>"
 
 
 def appointments() -> dict[date, str]:
@@ -72,7 +115,15 @@ def render_calendar() -> None:
     appts = appointments()
     today = date.today()
 
+    # In "My summary" view, show the chosen summary period (person B's date picker, key "sum_period").
+    period = None
+    if st.session_state.get("view") == "summary":
+        # Same default as summary.py (the 7 days ending on the selected day) until the picker has drawn.
+        period = st.session_state.get("sum_period") or (selected - timedelta(days=6), selected)
+    in_period = (lambda d: period[0] <= d <= period[1]) if isinstance(period, tuple) and len(period) == 2 else (lambda d: False)
+
     st.html(_CSS)
+    st.html(_picker_css(filled, appts, today))  # same colors inside the summary date picker
 
     prev, title, nxt = st.columns([1, 4, 1], vertical_alignment="center")
     if prev.button(":material/chevron_left:", key="cal_prev", type="tertiary"):
@@ -103,7 +154,8 @@ def render_calendar() -> None:
                         kind, tip = "entry", "You wrote this day"
                     else:
                         kind, tip = "empty", "No entry"
-                    flags = ("-sel" if d == selected else "") + ("-today" if d == today else "")
+                    flags = (("-sel" if d == selected else "") + ("-today" if d == today else "")
+                             + ("-range" if in_period(d) else ""))
                     st.button(
                         str(d.day), key=f"cal-{kind}{flags}-{d}", help=tip,
                         on_click=_select, args=(d,), disabled=d > today, width="stretch",
@@ -116,6 +168,10 @@ def render_calendar() -> None:
                 f"box-shadow:inset 0 0 0 1px {outline}'></span>{label}</span>")
 
     legend = swatch(ENTRY_GREEN, "Entry") + swatch(EMPTY_BG, "No entry", outline="#B8C4D0") + swatch(APPT_PURPLE, "Appointment")
+    if isinstance(period, tuple) and len(period) == 2:
+        legend += (f"<span style='display:inline-flex;align-items:center;gap:6px'>"
+                   f"<span style='width:14px;height:4px;border-radius:2px;background:{SELECTED_RING}'></span>"
+                   f"Summary period</span>")
     html = f"<div style='font-size:0.85rem;color:{EMPTY_TEXT};margin-top:4px'>{legend}</div>"
 
     upcoming = sorted(d for d in appts if d >= today)

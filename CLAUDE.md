@@ -1,4 +1,4 @@
-# Project: Inwords, pre-visit journal (hackathon, deadline 17:30)
+# Project: In2Words, pre-visit journal (hackathon, deadline 17:30)
 
 ## What it is
 A Streamlit journal app that helps psychiatry patients put their feelings into words before a visit.
@@ -32,10 +32,11 @@ Main feature: detect vagueness in journal entries and gently help her be more sp
 | File | Owner | What |
 |---|---|---|
 | app.py | C | page layout, day view, entry box; calls the other modules |
-| calendar_view.py | C | small green/gray/purple month calendar |
+| calendar_view.py | C | small green/gray/purple month calendar; in My summary it shows the summary period (reads B's `sum_period`) and colors B's date-picker popup the same way (CSS only, sv/en labels) |
 | questionnaire.py | C | popup wizard (3 steps, one tap each, Skip per step) for new vague entries and for re-answering saved ones (Edit → Change answers); uses A's pending contract, BODY/DURATION, claude_client.clarify |
 | entries.py | C | entry storage in session_state (add_entry, for_day, between, by_id) |
 | auth.py | C | password gate |
+| brand.py | C | In2Words wordmark (Sora font, gradient "2") |
 | data/sara.json | C | demo entries (`days_ago` so dates stay current) |
 | data/appointments.json | C | appointments (`days_from_now`) |
 | .streamlit/config.toml | C | theme/colors (create if needed) |

@@ -3,6 +3,8 @@ import hmac
 
 import streamlit as st
 
+import brand
+
 
 def _expected_password() -> str | None:
     try:
@@ -17,7 +19,7 @@ def require_password() -> None:
     if not expected or st.session_state.get("authenticated"):
         return
 
-    st.title("Inwords", anchor=False)
+    brand.wordmark()
     with st.form("login"):
         pw = st.text_input("Password", type="password")
         if st.form_submit_button("Enter"):
