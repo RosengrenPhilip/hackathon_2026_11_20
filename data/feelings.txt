@@ -1,0 +1,8 @@
+# Feelings Wheel (core -> secondary words). One core per line: Core: word, word, ...
+Sad: lonely, vulnerable, despairing, guilty, depressed, hurt, empty, grief-stricken, isolated, ashamed, disappointed, powerless
+Scared: anxious, insecure, overwhelmed, rejected, threatened, frightened, helpless, worried, exposed, inadequate, nervous, panicky
+Angry: let down, frustrated, irritated, bitter, mad, humiliated, resentful, distant, critical, annoyed, jealous, provoked
+Disgusted: disapproving, disappointed, awful, repelled, judgmental, embarrassed, appalled, revolted, nauseated, detestable, hesitant, uncomfortable
+Bad: bored, busy, stressed, tired, indifferent, apathetic, pressured, rushed, unfocused, sleepy, out of control, numb
+Surprised: startled, confused, amazed, excited, shocked, dismayed, disillusioned, perplexed, astonished, eager, energetic, restless
+Happy: playful, content, interested, proud, accepted, powerful, peaceful, trusting, optimistic, hopeful, thankful, relieved
