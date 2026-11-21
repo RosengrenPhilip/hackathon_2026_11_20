@@ -1,5 +1,5 @@
 [
   {"id": "E1", "days_ago": 5, "text": "Mum called. I got irritated over nothing and hung up. idk, just off.", "answers": {"feelings": ["irritated"], "body": ["Chest"], "duration": "A few weeks"}, "clarification": "I've felt irritated, with a tightness in my chest, for a few weeks."},
   {"id": "E2", "days_ago": 3, "text": "Booked my first psychiatry appointment. Felt kinda weird about it afterwards, not great.", "answers": {"feelings": ["anxious"], "body": ["Stomach"], "duration": "A few days"}, "clarification": "I've felt anxious, and I notice it in my stomach, for a few days."},
-  {"id": "E3", "days_ago": 1, "text": "Ate dinner standing in the kitchen again. Didn't really taste anything. Just meh.", "answers": {"feelings": ["numb"], "body": ["Whole body"], "duration": "Months"}, "clarification": "I've felt numb in my whole body for months."}
+  {"id": "E3", "days_ago": 1, "text": "Ate dinner standing in the kitchen again. Didn't really taste anything. Felt kind of strange.", "answers": {"feelings": ["numb"], "body": ["Whole body"], "duration": "Months"}, "clarification": "I've felt numb in my whole body for months."}
 ]
