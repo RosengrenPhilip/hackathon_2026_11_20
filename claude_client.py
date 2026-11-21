@@ -166,6 +166,43 @@ def summarize(entries: list[dict]) -> dict | None:
     Input per entry: id, date, text (her original words) and answers (what she picked).
     The clarification sentence must NOT be sent - the summary is built from her own words + answers.
     Returns {"sentences": [{"text": str, "sources": ["E2", ...]}]} or None on failure.
-    TODO(B): call Claude via _call_json with prompts/summary.txt.
     """
-    return None
+    # Send only the allowed fields, even if a caller passes more (e.g. the clarification).
+    payload = [{k: e.get(k) for k in ("id", "date", "text", "answers")} for e in entries]
+    result = _call_json(_prompt("summary"), json.dumps(payload, ensure_ascii=False), _SUMMARY_SCHEMA)
+    if result is None:
+        return None
+
+    # Keep only source IDs that really exist; drop sentences left without a source.
+    valid_ids = {e["id"] for e in entries}
+    sentences = []
+    for s in result["sentences"]:
+        sources = list(dict.fromkeys(src for src in s["sources"] if src in valid_ids))
+        text = s["text"].strip()
+        if text and sources:
+            sentences.append({"text": text, "sources": sources})
+    if not sentences:
+        st.session_state["last_error"] = "The summary came back empty, showing your entries instead."
+        return None
+    return {"sentences": sentences}
+
+
+_SUMMARY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "sentences": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "sources": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": ["text", "sources"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["sentences"],
+    "additionalProperties": False,
+}
