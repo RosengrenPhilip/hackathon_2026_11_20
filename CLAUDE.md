@@ -1,4 +1,4 @@
-# Project: Pre-visit companion (hackathon, deadline 17:30)
+# Project: Inwords, pre-visit journal (hackathon, deadline 17:30)
 
 ## What it is
 A Streamlit journal app that helps psychiatry patients put their feelings into words before a visit.
@@ -33,6 +33,7 @@ Main feature: detect vagueness in journal entries and gently help her be more sp
 |---|---|---|
 | app.py | C | page layout, day view, entry box; calls the other modules |
 | calendar_view.py | C | small green/gray/purple month calendar |
+| questionnaire.py | C | popup wizard (3 steps, one tap each, Skip per step) for new vague entries and for re-answering saved ones (Edit → Change answers); uses A's pending contract, BODY/DURATION, claude_client.clarify |
 | entries.py | C | entry storage in session_state (add_entry, for_day, between, by_id) |
 | auth.py | C | password gate |
 | data/sara.json | C | demo entries (`days_ago` so dates stay current) |
@@ -53,7 +54,7 @@ Three people work in parallel on separate branches. If it isn't clear which pers
 |---|---|---|
 | A | feature/vagueness | vagueness.py, prompts/vagueness.txt, prompts/clarify.txt, "PERSON A" section of claude_client.py |
 | B | feature/summary | summary.py, prompts/summary.txt, "PERSON B" section of claude_client.py |
-| C | feature/gui | app.py, calendar_view.py, entries.py, auth.py, data/sara.json, .streamlit/config.toml |
+| C | feature/gui | app.py, calendar_view.py, questionnaire.py, entries.py, auth.py, data/sara.json, .streamlit/config.toml |
 Rules:
 - NEVER edit another person's files or claude_client.py sections. If a change is needed there, tell the user what to ask the owner for.
 - Each module's docstring is its contract (function signatures + session_state format). Don't change a contract without the team agreeing.

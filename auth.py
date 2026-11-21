@@ -17,7 +17,7 @@ def require_password() -> None:
     if not expected or st.session_state.get("authenticated"):
         return
 
-    st.title("Pre-visit companion")
+    st.title("Inwords", anchor=False)
     with st.form("login"):
         pw = st.text_input("Password", type="password")
         if st.form_submit_button("Enter"):

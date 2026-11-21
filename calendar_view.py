@@ -109,8 +109,25 @@ def render_calendar() -> None:
                         on_click=_select, args=(d,), disabled=d > today, width="stretch",
                     )
 
-    st.caption(":green[■] Entry  ·  :gray[■] No entry  ·  :violet[■] Appointment")
+    # Legend + next appointment use the exact calendar colors above (theme colors differ slightly).
+    def swatch(bg: str, label: str, outline: str = "transparent") -> str:
+        return (f"<span style='display:inline-flex;align-items:center;gap:6px;margin-right:14px'>"
+                f"<span style='width:14px;height:14px;border-radius:4px;background:{bg};"
+                f"box-shadow:inset 0 0 0 1px {outline}'></span>{label}</span>")
+
+    legend = swatch(ENTRY_GREEN, "Entry") + swatch(EMPTY_BG, "No entry", outline="#B8C4D0") + swatch(APPT_PURPLE, "Appointment")
+    html = f"<div style='font-size:0.85rem;color:{EMPTY_TEXT};margin-top:4px'>{legend}</div>"
+
     upcoming = sorted(d for d in appts if d >= today)
     if upcoming:
         nxt_day = upcoming[0]
-        st.caption(f":violet[:material/event:] Next appointment: **{nxt_day:%a} {nxt_day.day} {nxt_day:%b}**")
+        days_left = (nxt_day - today).days
+        when = "today" if days_left == 0 else "tomorrow" if days_left == 1 else f"in {days_left} days"
+        html += (
+            f"<div style='margin-top:12px;padding:10px 14px;border-radius:12px;"
+            f"background:{APPT_PURPLE};color:#fff;font-size:0.9rem;line-height:1.35'>"
+            f"<div style='opacity:0.85;font-size:0.78rem'>Next appointment · {when}</div>"
+            f"<div style='font-weight:600'>{nxt_day:%A} {nxt_day.day} {nxt_day:%B}</div>"
+            f"<div style='opacity:0.9;font-size:0.8rem'>{appts[nxt_day]}</div></div>"
+        )
+    st.html(html)
