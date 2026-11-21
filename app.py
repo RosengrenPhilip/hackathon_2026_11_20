@@ -1,10 +1,14 @@
+"""Layout + state + wiring. SHARED: keep edits tiny, or ask the team first."""
 import json
 from datetime import date
 from pathlib import Path
 
 import streamlit as st
 
+import brief
 import claude_client
+import questions
+import safety
 from auth import require_password
 
 st.set_page_config(page_title="Pre-visit companion", layout="wide")
@@ -16,9 +20,10 @@ DATA = Path(__file__).parent / "data"
 def init_state():
     if "notes" not in st.session_state:
         st.session_state.notes = json.loads((DATA / "sara.json").read_text(encoding="utf-8"))
-    st.session_state.setdefault("questions", [])
-    st.session_state.setdefault("asked", [])
-    st.session_state.setdefault("brief", [])
+    st.session_state.setdefault("questions", [])  # see questions.py for item format
+    st.session_state.setdefault("asked", [])  # every question text ever shown
+    st.session_state.setdefault("brief", [])  # see questions.py for line format
+    st.session_state.setdefault("highlight", set())  # note IDs to highlight (receipts)
 
 
 def next_note_id() -> str:
@@ -27,6 +32,7 @@ def next_note_id() -> str:
 
 
 init_state()
+safety.render_banner()
 
 st.title("Pre-visit companion")
 st.caption("Others summarize what patients say. We help patients say it.")
@@ -37,8 +43,11 @@ left, right = st.columns(2, gap="large")
 with left:
     st.subheader("My notes")
     for i, note in enumerate(st.session_state.notes):
+        label = f"**{note['id']}** · {note['date']}"
+        if note["id"] in st.session_state.highlight:
+            label = f":orange-background[{label} · source]"
         with st.container(border=True):
-            st.markdown(f"**{note['id']}** · {note['date']}")
+            st.markdown(label)
             new_text = st.text_area(
                 "Note", note["text"], key=f"note_{note['id']}", label_visibility="collapsed"
             )
@@ -47,17 +56,17 @@ with left:
     with st.form("add_note", clear_on_submit=True):
         text = st.text_area("New note", placeholder="How was today?")
         if st.form_submit_button("Add note") and text.strip():
+            note_id = next_note_id()
             st.session_state.notes.append(
-                {"id": next_note_id(), "date": date.today().isoformat(), "text": text.strip()}
+                {"id": note_id, "date": date.today().isoformat(), "text": text.strip()}
             )
+            safety.check_text(text, source=f"note {note_id}")
             st.rerun()
 
 # ---------------- RIGHT: Brief + questions ----------------
 with right:
     st.subheader("My visit brief")
-    with st.container(border=True):
-        st.markdown("**What I want from today**")
-        st.caption("Answer questions below to build your brief.")
+    brief.render_brief()
 
     if st.button("Reflect on my week", type="primary", use_container_width=True):
         st.session_state.pop("last_error", None)
@@ -67,9 +76,6 @@ with right:
         st.session_state.asked += [q["question"] for q in qs]
 
     if err := st.session_state.get("last_error"):
-        st.warning(f"{err} Please try again.")
+        st.warning(err)
 
-    for q in st.session_state.questions:
-        with st.container(border=True):
-            st.markdown(q["question"])
-            st.caption(f"About {q['note_id']} · {q['angle']}")
+    questions.render_questions()

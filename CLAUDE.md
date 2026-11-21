@@ -23,13 +23,29 @@ Demo user: Sara, 24, first psychiatry visit, struggles to explain how she feels.
 - Prompts live in prompts/*.txt, not in code. Few-shot style examples: data/examples.json (Counsel Chat, regenerate with `uv run python scripts/build_examples.py`).
 
 ## Structure
-app.py            # layout, state, wiring
-claude_client.py  # get_questions, answer_to_brief_line, wordfinder_options, rephrase, crisis_check
-questions.py      # question cards UI
-wordfinder.py     # word finder UI
-safety.py         # crisis banner
-prompts/          # questions.txt, brief_line.txt, wordfinder.txt, safety.txt
+app.py            # layout, state, wiring (DONE - shared, don't edit without asking the team)
+auth.py           # password gate (DONE)
+claude_client.py  # all Claude calls; one section per person (see below)
+questions.py      # A: question cards, Answer/Skip -> brief line
+wordfinder.py     # B: "Help me find the words"
+safety.py         # C: crisis check + banner
+brief.py          # C: brief panel, approve/edit/remove, receipts
+prompts/          # questions.txt (done), brief_line.txt (A), wordfinder.txt (B), safety.txt (C)
 data/             # sara.json (demo notes, preloaded), feelings.txt, examples.json
+
+## Team ownership (IMPORTANT for Claude Code)
+Three people work in parallel on separate branches. Before editing, ask the user which person they are if it isn't clear.
+| Person | Branch | May edit |
+|---|---|---|
+| A | feature/questions | questions.py, prompts/brief_line.txt, "PERSON A" section of claude_client.py |
+| B | feature/wordfinder | wordfinder.py, prompts/wordfinder.txt, "PERSON B" section of claude_client.py |
+| C | feature/safety | safety.py, brief.py, prompts/safety.txt, "PERSON C" section of claude_client.py |
+Rules:
+- NEVER edit another person's files or claude_client.py sections. If a change is needed there, tell the user what to ask the owner for.
+- Don't edit app.py or auth.py. The wiring is done; each module's docstring describes its contract (function signature + session_state format). Don't change a contract without the team agreeing.
+- Data shared via st.session_state: notes, questions, asked, brief, highlight, crisis, last_error. Formats are in the module docstrings.
+- Work only on your own branch; merge to main via Pull Request. main is what Streamlit Cloud deploys, so it must always run.
+- Guardrail: copy .claude/team/person-X.json to .claude/settings.local.json; it denies edits to other people's files.
 
 ## Constraints
 - Python + uv. Run: `uv run streamlit run app.py`. `datasets` is a dev-only dependency.

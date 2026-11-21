@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(./app.py)",
+      "Edit(./auth.py)",
+      "Edit(./questions.py)",
+      "Edit(./safety.py)",
+      "Edit(./brief.py)",
+      "Edit(./prompts/brief_line.txt)",
+      "Edit(./prompts/safety.txt)",
+      "Edit(./prompts/questions.txt)"
+    ]
+  }
+}

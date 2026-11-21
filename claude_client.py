@@ -60,7 +60,7 @@ def _call_json(system: str, user: str, schema: dict, effort: str = "medium") -> 
             fallbacks="default",
         )
     except anthropic.APIError as e:
-        st.session_state["last_error"] = f"Claude API error: {e}"
+        st.session_state["last_error"] = f"Claude API error, please try again. ({e})"
         return None
     except TypeError:  # raised by the SDK when no API key is configured
         st.session_state["last_error"] = "No ANTHROPIC_API_KEY found in .streamlit/secrets.toml."
@@ -120,3 +120,46 @@ def get_questions(notes: list[dict], asked: list[str]) -> list[dict]:
         return []
     valid_ids = {n["id"] for n in notes}
     return [q for q in data.get("questions", []) if q.get("note_id") in valid_ids][:3]
+
+
+# =====================================================================
+# PERSON A (feature/questions): answer -> brief line
+# Only edit inside this section. Prompt: prompts/brief_line.txt
+# =====================================================================
+def answer_to_brief_line(question: str, answer: str, note_id: str, notes: list[dict]) -> dict | None:
+    """Turn her answer into ONE first-person brief line.
+    Returns {"text": str, "sources": ["E2", ...], "section": str} or None on failure.
+    TODO(A): call Claude via _call_json with prompts/brief_line.txt.
+    """
+    return {"text": answer.strip(), "sources": [note_id], "section": "What I want from today"}
+
+
+# =====================================================================
+# PERSON B (feature/wordfinder): word finder
+# Only edit inside this section. Prompt: prompts/wordfinder.txt
+# =====================================================================
+def wordfinder_options(answer: str, note_text: str) -> dict | None:
+    """Suggest 6 feeling words from data/feelings.txt that might fit.
+    Returns {"feelings": [6 words]} or None.
+    TODO(B): call Claude via _call_json.
+    """
+    return None
+
+
+def rephrase(answer: str, feelings: list[str], body: list[str], duration: str | None) -> str | None:
+    """Write ONE first-person sentence using ONLY what she picked. Never add symptoms.
+    TODO(B): call Claude via _call_json.
+    """
+    return None
+
+
+# =====================================================================
+# PERSON C (feature/safety): crisis check
+# Only edit inside this section. Prompt: prompts/safety.txt
+# =====================================================================
+def crisis_check(text: str) -> dict | None:
+    """Check text for self-harm, hopelessness, plans.
+    Returns {"crisis": bool, "reason": str} or None on failure (safety.py then uses keywords).
+    TODO(C): call Claude via _call_json with prompts/safety.txt.
+    """
+    return None
