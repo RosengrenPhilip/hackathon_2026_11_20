@@ -5,15 +5,19 @@ Use your own judgment. Ask yourself: if a clinician read this entry, would they 
 VAGUE means the entry points at a feeling without naming it. Examples:
 - "idk, just felt off today"
 - "it was a weird day"
-- "bad day. whatever."
 - "I felt kind of something at work, not great"
 - "I'm fine I guess"
+-"Today was a good day"
+- "Did not make it to school"
+- "I cancelled plans"
 Context matters more than words: "fine" can be honest ("Had a fine lunch with mom") or a cover ("I'm fine. Didn't leave bed."). Only flag it when the feeling itself is unclear.
 
 NOT VAGUE means she already names what she felt, even briefly. Examples:
 - "I felt anxious before class and my hands were shaking"
 - "Lonely tonight. Everyone was out."
 - "Went for a walk, felt calmer after"
+- "Had a meeting with the boss, felt useless"
+- " Today I meet some friends at the bar tonight, slamming beers, happy!"
 An entry that only describes events (what she did) without any hint of a feeling is NOT vague. Don't push her to add feelings she didn't hint at.
 
 If it is vague:
